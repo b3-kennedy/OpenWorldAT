@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-
+//[ExecuteInEditMode]
 public class WorldLoader : MonoBehaviour
 {
     public Transform worldPos;
@@ -56,7 +56,7 @@ public class WorldLoader : MonoBehaviour
                         deactivatedChunks.Remove(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
                     }
                     GameObject newMesh = meshGen.CreateChunk(new Vector2((meshes[i].transform.localPosition.x / 200)-1, (meshes[i].transform.localPosition.z / 200)-1));
-                    newMesh.transform.SetParent(worldPos);
+                    newMesh.transform.SetParent(worldPos.GetChild(0));
                     newMesh.transform.position = new Vector3(meshes[i].transform.localPosition.x, 0, meshes[i].transform.localPosition.z);
                     chunksInScene.Add(newMesh);
                     activeChunks.Add(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));

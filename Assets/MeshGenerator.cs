@@ -11,6 +11,10 @@ public class MeshGenerator : MonoBehaviour
 
     public GameObject[] trees;
 
+    public GameObject building;
+
+    public GameObject npc;
+
     Vector3[] vertices;
     int[] triangles;
     public int xSize;
@@ -64,6 +68,8 @@ public class MeshGenerator : MonoBehaviour
         CreateShape(name);
         UpdateMesh();
         TreePass(chunkCoord);
+        BuildingPass(chunkCoord);
+        NPCPass(chunkCoord);
 
 
         return chunkObj;
@@ -94,7 +100,6 @@ public class MeshGenerator : MonoBehaviour
     void TreePass(Vector2 chunkCoord)
     {
         string path = "Assets/Resources/ObjectData/" + "TreeData" + ".txt";
-        StreamReader reader = new StreamReader(path);
         string[] lines = System.IO.File.ReadAllLines(path);
         foreach (var line in lines)
         {
@@ -112,8 +117,55 @@ public class MeshGenerator : MonoBehaviour
 
 
         }
-        reader.Close();
 
+    }
+
+    void NPCPass(Vector2 chunkCoord)
+    {
+        string path = "Assets/Resources/ObjectData/" + "NPCData" + ".txt";
+        string[] lines = System.IO.File.ReadAllLines(path);
+        foreach (var line in lines)
+        {
+            string[] split = line.Split(':');
+            string npcName = split[0];
+            string[] vectorSplit = split[2].Split(',');
+            string[] rotSplit = split[3].Split(',');
+            Vector3 npcPos = new Vector3(float.Parse(vectorSplit[0]), float.Parse(vectorSplit[1]), float.Parse(vectorSplit[2]));
+            Quaternion npcRot = new Quaternion(float.Parse(rotSplit[0]), float.Parse(rotSplit[1]), float.Parse(rotSplit[2]), float.Parse(rotSplit[3]));
+            if (chunkCoord == new Vector2(Mathf.Round(npcPos.x / 200), Mathf.Round(npcPos.z / 200)))
+            {
+                GameObject newBuilding = Instantiate(npc, transform.GetChild(1));
+                newBuilding.transform.position = npcPos;
+                newBuilding.transform.rotation = npcRot;
+                GetComponent<WorldLoader>().trees.Add(newBuilding);
+            }
+
+
+        }
+    }
+
+    void BuildingPass(Vector2 chunkCoord)
+    {
+        string path = "Assets/Resources/ObjectData/" + "BuildingData" + ".txt";
+        string[] lines = System.IO.File.ReadAllLines(path);
+        foreach (var line in lines)
+        {
+            string[] split = line.Split(':');
+            string buildingName = split[0];
+            string[] vectorSplit = split[1].Split(',');
+            string[] rotSplit = split[2].Split(',');
+            Vector3 buildingPos = new Vector3(float.Parse(vectorSplit[0]), float.Parse(vectorSplit[1]), float.Parse(vectorSplit[2]));
+            Quaternion buildingRot = new Quaternion(float.Parse(rotSplit[0]), float.Parse(rotSplit[1]), float.Parse(rotSplit[2]), float.Parse(rotSplit[3]));
+            if (chunkCoord == new Vector2(Mathf.Round(buildingPos.x / 200), Mathf.Round(buildingPos.z / 200)))
+            {
+                GameObject newBuilding = Instantiate(building, transform.GetChild(1));
+                newBuilding.transform.position = buildingPos;
+                newBuilding.transform.rotation = buildingRot;
+                GetComponent<WorldLoader>().trees.Add(newBuilding);
+            }
+
+
+        }
     }
 
     Vector3 vertexToWorld(Vector3 vert)

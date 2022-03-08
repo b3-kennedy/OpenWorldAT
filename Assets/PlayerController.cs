@@ -35,6 +35,11 @@ public class PlayerController : MonoBehaviour
 		float moveZ = Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime;
 
 		transform.Translate(moveX, 0.0f, moveZ);
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+			GetComponent<Rigidbody>().AddForce(transform.up * 1000);
+        }
 	}
 
 	void Camera()
