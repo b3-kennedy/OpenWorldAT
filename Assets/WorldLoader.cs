@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
+
 public class WorldLoader : MonoBehaviour
 {
     public Transform worldPos;
@@ -12,6 +13,7 @@ public class WorldLoader : MonoBehaviour
     public List<GameObject> chunksInScene;
     public List<Vector2> activeChunks;
     public List<Vector2> deactivatedChunks;
+    public List<GameObject> trees;
     public GameObject player;
     public GameObject prevChunk;
     public int chunkViewDistance;
@@ -34,9 +36,9 @@ public class WorldLoader : MonoBehaviour
             print("exists");
         }
         mesh = gameObject;
-        for (int i = 0; i < gameObject.transform.childCount; i++)
+        for (int i = 0; i < gameObject.transform.GetChild(0).childCount; i++)
         {
-            meshes[i] = gameObject.transform.GetChild(i).gameObject;
+            meshes[i] = gameObject.transform.GetChild(0).GetChild(i).gameObject;
         }
 
     }
@@ -69,6 +71,7 @@ public class WorldLoader : MonoBehaviour
     void Update()
     {
         chunksInScene.RemoveAll(GameObject => GameObject == null);
+        trees.RemoveAll(GameObject => GameObject == null);
 
         //StartCoroutine(CreateChunk());
 
@@ -109,8 +112,32 @@ public class WorldLoader : MonoBehaviour
             {
                 Destroy(GetChunkAt(chunk));
                 activeChunks.Remove(chunk);
+                if (trees.Count > 0)
+                {
+                    foreach (var tree in trees)
+                    {
+                        if (chunk == CalculateChunkPosition(tree))
+                        {
+                            Destroy(tree);
+                        }
+                    }
+                }
+
             }
         }
+
+
+        //if(trees.Count > 0)
+        //{
+        //    foreach (var tree in trees)
+        //    {
+        //        if (deactivatedChunks.Contains(CalculateChunkPosition(tree)))
+        //        {
+        //            Destroy(tree);
+        //        }
+        //    }
+        //}
+
 
     }
 
@@ -120,7 +147,7 @@ public class WorldLoader : MonoBehaviour
         return playerPos;
     }
 
-    Vector2 CalculateChunkPosition(GameObject chunk)
+    public Vector2 CalculateChunkPosition(GameObject chunk)
     {
         Vector2 chunkPos = new Vector2(Mathf.Round(chunk.transform.position.x / 200), Mathf.Round(chunk.transform.position.z / 200));
         return chunkPos;

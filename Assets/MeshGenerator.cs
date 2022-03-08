@@ -9,6 +9,8 @@ public class MeshGenerator : MonoBehaviour
     Mesh mesh;
     public Material mat;
 
+    public GameObject[] trees;
+
     Vector3[] vertices;
     int[] triangles;
     public int xSize;
@@ -61,11 +63,58 @@ public class MeshGenerator : MonoBehaviour
 
         CreateShape(name);
         UpdateMesh();
+        TreePass(chunkCoord);
 
 
         return chunkObj;
     }
 
+    void PlaceTree(Vector2 chunkCoord)
+    {
+        string path = "Assets/Resources/TerrainData/" + "TreeData" + ".txt";
+        StreamWriter writer = new StreamWriter(path, true);
+        Debug.Log(chunkCoord);
+        foreach (var vertex in vertices)
+        {
+            if(vertex.y > 10)
+            {
+                int num = Random.Range(0, 5000);
+                if(num == 5)
+                {
+                    int treeNum = Random.Range(0, 4);
+                    GameObject newTree = Instantiate(trees[treeNum], transform);
+                    newTree.transform.position = vertexToWorld(new Vector3((chunkCoord.x * 200) + vertex.x, vertex.y, (chunkCoord.y * 200) + vertex.z));
+                    writer.WriteLine(treeNum.ToString() + ":" + newTree.transform.position.x.ToString() + "," + newTree.transform.position.y.ToString() + "," + newTree.transform.position.z.ToString());
+                }
+            }
+        }
+        writer.Close();
+    }
+
+    void TreePass(Vector2 chunkCoord)
+    {
+        string path = "Assets/Resources/ObjectData/" + "TreeData" + ".txt";
+        StreamReader reader = new StreamReader(path);
+        string[] lines = System.IO.File.ReadAllLines(path);
+        foreach (var line in lines)
+        {
+            string[] split = line.Split(':');
+            int treeType = int.Parse(split[0]);
+            string[] vectorSplit = split[1].Split(',');
+            Vector3 treePos = new Vector3(float.Parse(vectorSplit[0]), float.Parse(vectorSplit[1]), float.Parse(vectorSplit[2]));
+
+            if(chunkCoord == new Vector2(Mathf.Round(treePos.x/200), Mathf.Round(treePos.z / 200)))
+            {
+                GameObject newTree = Instantiate(trees[treeType], transform.GetChild(1));
+                newTree.transform.position = treePos;
+                GetComponent<WorldLoader>().trees.Add(newTree);
+            }
+
+
+        }
+        reader.Close();
+
+    }
 
     Vector3 vertexToWorld(Vector3 vert)
     {
@@ -77,7 +126,7 @@ public class MeshGenerator : MonoBehaviour
     void CreateShape(string fileName)
     {
 
-        string path = "Assets/Resources/" + fileName + ".txt";
+        string path = "Assets/Resources/TerrainData/" + fileName + ".txt";
         StreamReader reader = new StreamReader(path);
         string[] lines = System.IO.File.ReadAllLines(path);
         vertices = new Vector3[(xSize + 1) * (zSize + 1)];
