@@ -76,10 +76,17 @@ public class WorldLoader : MonoBehaviour
     {
         for (int j = 0; j < persistentChunks.Count; j++)
         {
-            GameObject persistentChunk = meshGen.CreateChunk(persistentChunks[j]);
-            persistentChunk.transform.SetParent(worldPos.GetChild(2));
-            persistentChunk.transform.position = new Vector3(persistentChunks[j].x * 200, 0, persistentChunks[j].y * 200);
-            activeChunks.Add(persistentChunks[j]);
+            if (!activeChunks.Contains(persistentChunks[j]))
+            {
+                GameObject persistentChunk = meshGen.CreateChunk(persistentChunks[j]);
+                persistentChunk.transform.SetParent(worldPos.GetChild(2));
+                persistentChunk.transform.position = new Vector3(persistentChunks[j].x * 200, 0, persistentChunks[j].y * 200);
+                activeChunks.Add(persistentChunks[j]);
+            }
+            else
+            {
+                GetChunkAt(persistentChunks[j]).transform.parent = worldPos.GetChild(2);
+            }
             //chunksInScene.Add(GetChunkAt(persistentChunks[j]));
         }
         worldPos.GetChild(2).gameObject.AddComponent<NavMeshSurface>();
@@ -91,9 +98,13 @@ public class WorldLoader : MonoBehaviour
     {
         for (int i = 0; i < transform.GetChild(2).childCount; i++)
         {
+            if(Vector3.Distance(transform.GetChild(2).GetChild(i).position, player.transform.position) > chunkViewDistance * 200)
+            {
+                Destroy(transform.GetChild(2).GetChild(i).gameObject);
 
-            Destroy(transform.GetChild(2).GetChild(i).gameObject);
-            
+            }
+
+
         }
         persistentChunks.Clear();
     }

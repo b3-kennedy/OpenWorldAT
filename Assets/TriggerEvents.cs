@@ -30,6 +30,10 @@ public class TriggerEvents : MonoBehaviour
                 {
                     world.GetComponent<WorldLoader>().AddPersistentChunks();
                     world.GetComponent<SpawnEnemies>().Spawn(new Vector3(908.8f, 20.05f, 721.3f));
+                    world.GetComponent<SpawnEnemies>().Spawn(new Vector3(903.8f, 20.05f, 721.3f));
+                    world.GetComponent<SpawnEnemies>().Spawn(new Vector3(901.8f, 20.05f, 721.3f));
+                    world.GetComponent<SpawnEnemies>().Spawn(new Vector3(900.8f, 20.05f, 721.3f));
+                    world.GetComponent<SpawnEnemies>().Spawn(new Vector3(910.8f, 20.05f, 721.3f));
                     npc.GetComponent<NPC>().UpdateFile();
                     Debug.Log("interacted");
                 }
