@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Unity.AI.Navigation;
 
 //[ExecuteInEditMode]
 public class WorldLoader : MonoBehaviour
@@ -9,10 +10,12 @@ public class WorldLoader : MonoBehaviour
     public Transform worldPos;
     public Material mat;
     public GameObject cube;
+    public GameObject persistentChunksObj;
     GameObject[] meshes = new GameObject[100];
     public List<GameObject> chunksInScene;
     public List<Vector2> activeChunks;
     public List<Vector2> deactivatedChunks;
+    public List<Vector2> persistentChunks;
     public List<GameObject> trees;
     public GameObject player;
     public GameObject prevChunk;
@@ -41,7 +44,21 @@ public class WorldLoader : MonoBehaviour
             meshes[i] = gameObject.transform.GetChild(0).GetChild(i).gameObject;
         }
 
+        for (int j = 0; j < persistentChunks.Count; j++)
+        {
+            GameObject persistentChunk = meshGen.CreateChunk(persistentChunks[j]);
+            persistentChunk.transform.SetParent(worldPos.GetChild(2));
+            persistentChunk.transform.position = new Vector3(persistentChunks[j].x * 200, 0, persistentChunks[j].y * 200);
+            activeChunks.Add(persistentChunks[j]);
+            //chunksInScene.Add(GetChunkAt(persistentChunks[j]));
+        }
+        worldPos.GetChild(2).gameObject.AddComponent<NavMeshSurface>();
+        worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().collectObjects = CollectObjects.Children;
+        worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().BuildNavMesh();
+
+
     }
+
 
     IEnumerator CreateChunk()
     {
@@ -74,7 +91,6 @@ public class WorldLoader : MonoBehaviour
         trees.RemoveAll(GameObject => GameObject == null);
 
         //StartCoroutine(CreateChunk());
-
         for (int i = 0; i < meshes.Length; i++)
         {
             if (Vector3.Distance(player.transform.position, meshes[i].transform.localPosition) < chunkViewDistance * 200)
@@ -100,7 +116,7 @@ public class WorldLoader : MonoBehaviour
 
         foreach (var chunk in activeChunks)
         {
-            if(Vector3.Distance(player.transform.position, new Vector3(chunk.x * 200, 0, chunk.y * 200)) > chunkViewDistance * 200)
+            if(Vector3.Distance(player.transform.position, new Vector3(chunk.x * 200, 0, chunk.y * 200)) > chunkViewDistance * 200 && !persistentChunks.Contains(chunk))
             {
                 deactivatedChunks.Add(chunk);
             }

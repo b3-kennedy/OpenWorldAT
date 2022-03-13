@@ -8,6 +8,8 @@ using UnityEngine;
 public class TriggerEvents : MonoBehaviour
 {
 
+    public GameObject world;
+
     bool inTrigger;
     public GameObject item;
     GameObject npc;
@@ -26,6 +28,7 @@ public class TriggerEvents : MonoBehaviour
             {
                 if(npc.GetComponent<NPC>().status == 0)
                 {
+                    world.GetComponent<SpawnEnemies>().Spawn(new Vector3(908.8f, 20.05f, 721.3f));
                     npc.GetComponent<NPC>().UpdateFile();
                     Debug.Log("interacted");
                 }

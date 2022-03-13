@@ -37,11 +37,11 @@ public class MeshGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            CreateChunk(new Vector2(0, 0));
-            CreateChunk(new Vector2(1, 0));
-        }
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    CreateChunk(new Vector2(0, 0));
+        //    CreateChunk(new Vector2(1, 0));
+        //}
     }
 
     public GameObject CreateChunk(Vector2 chunkCoord)
