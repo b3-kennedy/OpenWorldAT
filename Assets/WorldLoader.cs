@@ -43,20 +43,6 @@ public class WorldLoader : MonoBehaviour
         {
             meshes[i] = gameObject.transform.GetChild(0).GetChild(i).gameObject;
         }
-
-        for (int j = 0; j < persistentChunks.Count; j++)
-        {
-            GameObject persistentChunk = meshGen.CreateChunk(persistentChunks[j]);
-            persistentChunk.transform.SetParent(worldPos.GetChild(2));
-            persistentChunk.transform.position = new Vector3(persistentChunks[j].x * 200, 0, persistentChunks[j].y * 200);
-            activeChunks.Add(persistentChunks[j]);
-            //chunksInScene.Add(GetChunkAt(persistentChunks[j]));
-        }
-        worldPos.GetChild(2).gameObject.AddComponent<NavMeshSurface>();
-        worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().collectObjects = CollectObjects.Children;
-        worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().BuildNavMesh();
-
-
     }
 
 
@@ -85,6 +71,33 @@ public class WorldLoader : MonoBehaviour
         yield return null;
     }
     // Update is called once per frame
+
+    public void AddPersistentChunks()
+    {
+        for (int j = 0; j < persistentChunks.Count; j++)
+        {
+            GameObject persistentChunk = meshGen.CreateChunk(persistentChunks[j]);
+            persistentChunk.transform.SetParent(worldPos.GetChild(2));
+            persistentChunk.transform.position = new Vector3(persistentChunks[j].x * 200, 0, persistentChunks[j].y * 200);
+            activeChunks.Add(persistentChunks[j]);
+            //chunksInScene.Add(GetChunkAt(persistentChunks[j]));
+        }
+        worldPos.GetChild(2).gameObject.AddComponent<NavMeshSurface>();
+        worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().collectObjects = CollectObjects.Children;
+        worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().BuildNavMesh();
+    }
+
+    public void ClearPersistentChunks()
+    {
+        for (int i = 0; i < transform.GetChild(2).childCount; i++)
+        {
+
+            Destroy(transform.GetChild(2).GetChild(i).gameObject);
+            
+        }
+        persistentChunks.Clear();
+    }
+
     void Update()
     {
         chunksInScene.RemoveAll(GameObject => GameObject == null);
