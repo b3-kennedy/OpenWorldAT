@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
+//[ExecuteInEditMode]
 public class MeshGenerator : MonoBehaviour
 {
     GameObject chunkObj;
@@ -70,6 +71,7 @@ public class MeshGenerator : MonoBehaviour
         TreePass(chunkCoord);
         BuildingPass(chunkCoord);
         NPCPass(chunkCoord);
+        PlaceTree(chunkCoord);
 
 
         return chunkObj;
@@ -77,14 +79,14 @@ public class MeshGenerator : MonoBehaviour
 
     void PlaceTree(Vector2 chunkCoord)
     {
-        string path = "Assets/Resources/TerrainData/" + "TreeData" + ".txt";
+        string path = "Assets/Resources/TerrainData/" + "TreeData2" + ".txt";
         StreamWriter writer = new StreamWriter(path, true);
         Debug.Log(chunkCoord);
         foreach (var vertex in vertices)
         {
             if(vertex.y > 10)
             {
-                int num = Random.Range(0, 5000);
+                int num = Random.Range(0, 1000);
                 if(num == 5)
                 {
                     int treeNum = Random.Range(0, 4);
@@ -99,7 +101,7 @@ public class MeshGenerator : MonoBehaviour
 
     void TreePass(Vector2 chunkCoord)
     {
-        string path = "Assets/Resources/ObjectData/" + "TreeData" + ".txt";
+        string path = "Assets/Resources/ObjectData/" + "TreeData2" + ".txt";
         string[] lines = System.IO.File.ReadAllLines(path);
         foreach (var line in lines)
         {

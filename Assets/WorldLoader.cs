@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Unity.AI.Navigation;
+using Unity.Jobs;
+using Unity.Collections;
 
 //[ExecuteInEditMode]
+
+
 public class WorldLoader : MonoBehaviour
 {
     public Transform worldPos;
@@ -16,6 +20,7 @@ public class WorldLoader : MonoBehaviour
     public List<Vector2> activeChunks;
     public List<Vector2> deactivatedChunks;
     public List<Vector2> persistentChunks;
+    public List<Vector2> chunksToCreate;
     public List<GameObject> trees;
     public GameObject player;
     public GameObject prevChunk;
@@ -23,12 +28,15 @@ public class WorldLoader : MonoBehaviour
     GameObject mesh;
     MeshGenerator meshGen;
     public List<GameObject> view;
+    bool creatingChunks;
+
+    [Header("Performance Tests")]
+    public bool enableCoroutine;
 
 
     // Start is called before the first frame update
     void Start()
     {
-
         meshGen = GetComponent<MeshGenerator>();
         if (!Directory.Exists(Application.dataPath + "/Terrain"))
         {
@@ -46,31 +54,7 @@ public class WorldLoader : MonoBehaviour
     }
 
 
-    IEnumerator CreateChunk()
-    {
-        for (int i = 0; i < meshes.Length; i++)
-        {
-            if (Vector3.Distance(player.transform.position, meshes[i].transform.localPosition) < chunkViewDistance * 200)
-            {
-                if (!activeChunks.Contains(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200)))
-                {
-                    if (deactivatedChunks.Contains(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200)))
-                    {
-                        deactivatedChunks.Remove(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
-                    }
-                    GameObject newMesh = meshGen.CreateChunk(new Vector2((meshes[i].transform.localPosition.x / 200)-1, (meshes[i].transform.localPosition.z / 200)-1));
-                    newMesh.transform.SetParent(worldPos.GetChild(0));
-                    newMesh.transform.position = new Vector3(meshes[i].transform.localPosition.x, 0, meshes[i].transform.localPosition.z);
-                    chunksInScene.Add(newMesh);
-                    activeChunks.Add(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
 
-                }
-
-            }
-        }
-        yield return null;
-    }
-    // Update is called once per frame
 
     public void AddPersistentChunks()
     {
@@ -92,7 +76,10 @@ public class WorldLoader : MonoBehaviour
         worldPos.GetChild(2).gameObject.AddComponent<NavMeshSurface>();
         worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().collectObjects = CollectObjects.Children;
         worldPos.GetChild(2).gameObject.GetComponent<NavMeshSurface>().BuildNavMesh();
+        
     }
+
+
 
     public void ClearPersistentChunks()
     {
@@ -109,6 +96,24 @@ public class WorldLoader : MonoBehaviour
         persistentChunks.Clear();
     }
 
+
+    IEnumerator CreateChunks()
+    {
+        creatingChunks = true;
+        while (chunksToCreate.Count > 0)
+        {
+            GameObject newMesh = meshGen.CreateChunk(new Vector2(chunksToCreate[0].x, chunksToCreate[0].y));
+            newMesh.transform.SetParent(worldPos);
+            newMesh.transform.position = new Vector3(chunksToCreate[0].x * 200, 0, chunksToCreate[0].y * 200);
+            chunksInScene.Add(newMesh);
+            activeChunks.Add(new Vector2(chunksToCreate[0].x, chunksToCreate[0].y));
+            chunksToCreate.RemoveAt(0);
+            yield return null;
+        }
+        creatingChunks = false;
+    }
+
+
     void Update()
     {
         chunksInScene.RemoveAll(GameObject => GameObject == null);
@@ -119,17 +124,30 @@ public class WorldLoader : MonoBehaviour
         {
             if (Vector3.Distance(player.transform.position, meshes[i].transform.localPosition) < chunkViewDistance * 200)
             {
-                if (!activeChunks.Contains(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200)))
+                if (!activeChunks.Contains(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200)) && !chunksToCreate.Contains(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200)))
                 {
                     if (deactivatedChunks.Contains(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200)))
                     {
                         deactivatedChunks.Remove(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
                     }
-                    GameObject newMesh = meshGen.CreateChunk(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
-                    newMesh.transform.SetParent(worldPos);
-                    newMesh.transform.position = new Vector3(meshes[i].transform.localPosition.x, 0, meshes[i].transform.localPosition.z);
-                    chunksInScene.Add(newMesh);
-                    activeChunks.Add(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
+                    if (enableCoroutine)
+                    {
+                        chunksToCreate.Add(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
+                        if (chunksToCreate.Count > 0 && !creatingChunks)
+                        {
+                            StartCoroutine(CreateChunks());
+                        }
+                    }
+                    else
+                    {
+                        GameObject newMesh = meshGen.CreateChunk(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
+                        newMesh.transform.SetParent(worldPos);
+                        newMesh.transform.position = new Vector3(meshes[i].transform.localPosition.x, 0, meshes[i].transform.localPosition.z);
+                        chunksInScene.Add(newMesh);
+                        activeChunks.Add(new Vector2(meshes[i].transform.localPosition.x / 200, meshes[i].transform.localPosition.z / 200));
+                    }
+
+
 
                 }
 

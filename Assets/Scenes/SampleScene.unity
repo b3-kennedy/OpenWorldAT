@@ -659,11 +659,13 @@ MonoBehaviour:
   - {x: 5, y: 3}
   - {x: 5, y: 4}
   - {x: 4, y: 4}
+  chunksToCreate: []
   trees: []
   player: {fileID: 1884933842}
   prevChunk: {fileID: 0}
   chunkViewDistance: 5
   view: []
+  enableCoroutine: 0
 --- !u!4 &191755249
 Transform:
   m_ObjectHideFlags: 0
@@ -678,7 +680,6 @@ Transform:
   - {fileID: 1975899040}
   - {fileID: 1782966171}
   - {fileID: 690729014}
-  - {fileID: 1156546920}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2331,7 +2332,7 @@ RectTransform:
   - {fileID: 947991318}
   - {fileID: 1631300605}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2400,8 +2401,8 @@ Transform:
   m_LocalPosition: {x: 985, y: 162, z: 762}
   m_LocalScale: {x: 100, y: 500, z: 100}
   m_Children: []
-  m_Father: {fileID: 191755249}
-  m_RootOrder: 3
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1156546921
 BoxCollider:
@@ -2478,7 +2479,7 @@ NavMeshObstacle:
   m_Shape: 1
   m_Extents: {x: 0.5, y: 0.5, z: 0.5}
   m_MoveThreshold: 0.1
-  m_Carve: 0
+  m_Carve: 1
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
@@ -3796,12 +3797,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1884933842}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 227.02022, y: 45.62375, z: 349.69415}
+  m_LocalPosition: {x: 227.02022, y: 100, z: 349.69415}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1884933848
 Rigidbody:
@@ -3818,7 +3819,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 10
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &1884933849
 MonoBehaviour:
   m_ObjectHideFlags: 0
